@@ -177,16 +177,17 @@ public class Main {
         }
 
         System.out.println("Socio: " + socioActual.getNombre() + " " + socioActual.getApellidoPaterno());
-        System.out.print("Nuevo Teléfono (actual: " + socioActual.getTelefono() + "): ");
+        System.out.print("Nuevo Teléfono (actual: " + socioActual.getTelefono() + " - Enter para mantener): ");
         String nuevoTel = scanner.nextLine();
-        System.out.print("Nuevo País (actual: " + socioActual.getPais() + "): ");
+        String telFinal = nuevoTel.trim().isEmpty() ? socioActual.getTelefono() : nuevoTel;
+        System.out.print("Nuevo País (actual: " + socioActual.getPais() + " - Enter para mantener): ");
         String nuevoPais = scanner.nextLine();
+        String paisFinal = nuevoPais.trim().isEmpty() ? socioActual.getPais() : nuevoPais;
         System.out.print("Nuevo Apellido Materno (actual: " + socioActual.getApellidoMaterno() + " - Enter para mantener): ");
         String nuevoAMaterno = scanner.nextLine();
-
         String aMaternoFinal = nuevoAMaterno.trim().isEmpty() ? socioActual.getApellidoMaterno() : nuevoAMaterno;
 
-        if (sistema.modificarSocio(idSocio, nuevoTel, nuevoPais, aMaternoFinal)) {
+        if (sistema.modificarSocio(idSocio, telFinal, paisFinal, aMaternoFinal)) {
             System.out.println("Socio ID " + idSocio + " modificado exitosamente.");
         } else {
             System.out.println("Error: No se pudo modificar el socio.");
@@ -253,7 +254,6 @@ public class Main {
         boolean cubierta = scanner.nextLine().equalsIgnoreCase("S");
         System.out.print("Capacidad (Nro de personas): ");
         int capacidad = leerOpcion();
-        scanner.nextLine(); // Consumir el salto de línea pendiente
         System.out.print("Características adicionales: ");
         String caracteristicas = scanner.nextLine();
 
@@ -273,24 +273,32 @@ public class Main {
             return;
         }
 
-        scanner.nextLine();
-
         System.out.println("\n--- DATOS ACTUALES DE CANCHA ID " + idCancha + " ---");
         System.out.println(canchaActual);
 
-        System.out.print("Nuevo Nombre: ");
-        String nombre = scanner.nextLine();
-        System.out.print("Nuevo Deporte (actual: " + canchaActual.getDeporte() + "): ");
-        String deporte = scanner.nextLine();
-        System.out.print("¿Es Cubierta (S/N)? (actual: " + (canchaActual.isCubierta() ? "S" : "N") + "): ");
-        boolean cubierta = scanner.nextLine().equalsIgnoreCase("S");
-        System.out.print("Nueva Capacidad (Nro de personas): ");
-        int capacidad = leerOpcion();
-        scanner.nextLine();
-        System.out.print("Nuevas Características: ");
-        String caracteristicas = scanner.nextLine();
+        System.out.print("Nuevo Nombre (actual: " + canchaActual.getNombre() + " - Enter para mantener): ");
+        String nuevoNombre = scanner.nextLine();
+        String nombreFinal = nuevoNombre.trim().isEmpty() ? canchaActual.getNombre() : nuevoNombre;
 
-        if (sistema.modificarCancha(idCancha, nombre, deporte, cubierta, capacidad, caracteristicas)) {
+        System.out.print("Nuevo Deporte (actual: " + canchaActual.getDeporte() + " - Enter para mantener): ");
+        String nuevoDeporte = scanner.nextLine();
+        String deporteFinal = nuevoDeporte.trim().isEmpty() ? canchaActual.getDeporte() : nuevoDeporte;
+
+        boolean cubiertaFinal = canchaActual.isCubierta();
+        System.out.print("¿Es Cubierta (S/N)? (actual: " + (canchaActual.isCubierta() ? "S" : "N") + " - Enter para mantener): ");
+        String nuevaCubiertaStr = scanner.nextLine();
+        if (!nuevaCubiertaStr.trim().isEmpty()) {
+            cubiertaFinal = nuevaCubiertaStr.equalsIgnoreCase("S");
+        }
+
+        System.out.print("Nueva Capacidad (Nro de personas) [OBLIGATORIO, ingrese el valor actual si no desea cambiarlo]: ");
+        int capacidadFinal = leerOpcion();
+
+        System.out.print("Nuevas Características (actual: " + canchaActual.getCaracteristicas() + " - Enter para mantener): ");
+        String nuevasCaracteristicas = scanner.nextLine();
+        String caracteristicasFinal = nuevasCaracteristicas.trim().isEmpty() ? canchaActual.getCaracteristicas() : nuevasCaracteristicas;
+
+        if (sistema.modificarCancha(idCancha, nombreFinal, deporteFinal, cubiertaFinal, capacidadFinal, caracteristicasFinal)) {
             System.out.println("Cancha ID " + idCancha + " modificada exitosamente.");
         } else {
             System.out.println("Error: No se pudo modificar la cancha.");
@@ -527,7 +535,6 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("Precio inválido. Se asume $0.0.");
             precio = 0.0;
-            scanner.nextLine();
         }
 
         LocalDate fechaVigencia = leerFecha("Fecha de Vigencia (desde cuándo aplica)");

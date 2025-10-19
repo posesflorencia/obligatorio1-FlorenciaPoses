@@ -102,18 +102,48 @@ public class SistemaClub {
         return null;
     }
 
-    public boolean modificarCancha(int idCancha, String nombre, String deporte, boolean cubierta, int capacidad, String caracteristicas) {
+    public boolean modificarCancha(int idCancha, String nombre, String deporte,
+                                   boolean cubierta, int capacidad, String caracteristicas) {
         Cancha canchaAModificar = buscarCanchaPorId(idCancha);
 
-        if (canchaAModificar != null) {
-            canchaAModificar.setNombre(nombre);
-            canchaAModificar.setDeporte(deporte);
-            canchaAModificar.setCubierta(cubierta);
-            canchaAModificar.setCapacidad(capacidad);
-            canchaAModificar.setCaracteristicas(caracteristicas);
-            return true;
+        if (canchaAModificar == null) {
+            return false;
         }
-        return false;
+
+        //Verificar si hay reservas futuras pendientes:
+
+        boolean tieneReservasFuturas = false;
+
+        for (Reserva r : listaReservas) {
+            if (r.getCancha().getIdCancha() == idCancha && !r.getFecha().isBefore(LocalDate.now())) {
+                tieneReservasFuturas = true;
+                break;
+            }
+        }
+
+        //Si hay reservas futuras, solo permitir modificaciones no criticas para la tarifa:
+
+        if (tieneReservasFuturas) {
+
+            //Si intenta cambiar deporte o tipo (cubierta), se rechaza:
+
+            if (!canchaAModificar.getDeporte().equalsIgnoreCase(deporte) ||
+                    canchaAModificar.isCubierta() != cubierta) {
+
+                System.out.println("ADVERTENCIA (SistemaClub): Error de integridad. No se pueden cambiar el Deporte o la Condición (Cubierta/Descubierta) de la cancha ID " + idCancha + " porque tiene reservas futuras pendientes.");
+                return false;
+            }
+        }
+
+        //Aplicar las modificaciones:
+        //Si hay reservas futuras, solo se modificarán el nombre, capacidad y características.
+
+        canchaAModificar.setNombre(nombre);
+        canchaAModificar.setDeporte(deporte);
+        canchaAModificar.setCubierta(cubierta);
+        canchaAModificar.setCapacidad(capacidad);
+        canchaAModificar.setCaracteristicas(caracteristicas);
+        return true;
     }
 
     public boolean eliminarCancha(int idCancha) {
